@@ -1,7 +1,7 @@
 package router
 
 import (
-	"learningo/controllers"
+	"learningo/app/http/controllers"
 
 	"github.com/julienschmidt/httprouter"
 )

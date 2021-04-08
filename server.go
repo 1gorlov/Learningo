@@ -1,8 +1,8 @@
 package main
 
 import (
+	"learningo/app/models"
 	"learningo/database"
-	"learningo/models"
 	"learningo/router"
 	"log"
 	"net/http"

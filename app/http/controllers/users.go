@@ -3,7 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"learningo/models"
+	"learningo/app/models"
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
