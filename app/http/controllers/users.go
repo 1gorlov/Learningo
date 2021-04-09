@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"learningo/app/helpers"
 	"learningo/app/models"
 	"net/http"
 
@@ -11,10 +12,10 @@ import (
 
 type UsersController struct{}
 
-func AllUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func AllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	users, err := models.All()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helpers.JSONError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -24,25 +25,25 @@ func AllUsers(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func GetUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	user, err := models.Find(ps.ByName("id"))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helpers.JSONError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	json.NewEncoder(w).Encode(user)
 }
 
-func NewUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func NewUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var user models.User
 
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		helpers.JSONError(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	nu, err := models.Create(user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		helpers.JSONError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
