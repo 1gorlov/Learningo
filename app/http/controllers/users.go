@@ -13,41 +13,39 @@ import (
 type UsersController struct{}
 
 func AllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	users, err := models.All()
+	u, err := models.All()
 	if err != nil {
-		helpers.JSONError(w, err.Error(), http.StatusBadRequest)
+		helpers.JSONResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	json.NewEncoder(w).Encode(users)
+	helpers.JSONResponse(w, u, http.StatusOK)
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	user, err := models.Find(ps.ByName("id"))
+	u, err := models.Find(ps.ByName("id"))
 	if err != nil {
-		helpers.JSONError(w, err.Error(), http.StatusBadRequest)
+		helpers.JSONResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	json.NewEncoder(w).Encode(user)
+	helpers.JSONResponse(w, u, http.StatusOK)
 }
 
 func NewUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	var user models.User
+	var u models.User
 
-	err := json.NewDecoder(r.Body).Decode(&user)
+	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
-		helpers.JSONError(w, err.Error(), http.StatusBadRequest)
+		helpers.JSONResponse(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	nu, err := models.Create(user)
+	nu, err := models.Create(u)
 	if err != nil {
-		helpers.JSONError(w, err.Error(), http.StatusInternalServerError)
+		helpers.JSONResponse(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	json.NewEncoder(w).Encode(nu)
+	helpers.JSONResponse(w, nu, http.StatusOK)
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

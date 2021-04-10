@@ -24,7 +24,7 @@ func JwtAuth(pass httprouter.Handle) httprouter.Handle {
 		if a == "Auth" {
 			pass(w, r, p)
 		} else {
-			helpers.JSONError(w, "Unauthorized.", http.StatusUnauthorized)
+			helpers.JSONResponse(w, "Unauthorized.", http.StatusUnauthorized)
 			return
 		}
 	}
