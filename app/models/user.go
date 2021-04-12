@@ -8,46 +8,44 @@ import (
 
 type User struct {
 	gorm.Model
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Name         string
+	Email        string `gorm:"not null;unique_index"`
+	Password     string `gorm:"-"`
+	PasswordHash string `gorm:"not null"`
 }
 
-func All() ([]User, error) {
-	db, err := database.Connect()
-	if err != nil {
-		return nil, err
-	}
+var db = database.Connect()
 
+func (user *User) All() (*[]User, error) {
 	var users []User
-
-	if err := db.Find(&users).Error; err != nil {
-		return nil, err
-	}
-	return users, nil
+	err := db.Find(&users).Error
+	return &users, err
 }
 
-func Find(id string) (*User, error) {
-	db, err := database.Connect()
-	if err != nil {
-		return nil, err
-	}
-
-	var user User
-
-	if err := db.Where("id = ?", id).First(&user).Error; err != nil {
-		return nil, err
-	}
-	return &user, nil
+func (user *User) Find(id string) (*User, error) {
+	err := db.First(&user, id).Error
+	return user, err
 }
 
-func Create(user User) (*User, error) {
-	db, err := database.Connect()
-	if err != nil {
-		return nil, err
-	}
+func (user *User) Create() (*User, error) {
+	err := db.Create(&user).Error
+	return user, err
+}
 
-	if err := db.Create(&user).Error; err != nil {
+// Needs more modification
+func (user *User) Update(id string, nu User) (*User, error) {
+	if err := db.First(&user, id).Error; err != nil {
 		return nil, err
 	}
-	return &user, nil
+	user.Name = nu.Name
+	user.Email = nu.Email
+
+	err := db.Save(&user).Error
+
+	return user, err
+}
+
+func (user *User) Delete() error {
+	err := db.Delete(&user).Error
+	return err
 }

@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"learningo/app/helpers"
 	"learningo/app/models"
 	"net/http"
@@ -10,10 +9,9 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-type UsersController struct{}
-
 func AllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	u, err := models.All()
+	var um models.User
+	u, err := um.All()
 	if err != nil {
 		helpers.JSONResponse(w, err.Error(), http.StatusBadRequest)
 		return
@@ -22,7 +20,9 @@ func AllUsers(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	u, err := models.Find(ps.ByName("id"))
+	var um models.User
+
+	u, err := um.Find(ps.ByName("id"))
 	if err != nil {
 		helpers.JSONResponse(w, err.Error(), http.StatusBadRequest)
 		return
@@ -39,7 +39,24 @@ func NewUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 		return
 	}
 
-	nu, err := models.Create(u)
+	nu, err := u.Create()
+	if err != nil {
+		helpers.JSONResponse(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	helpers.JSONResponse(w, nu, http.StatusOK)
+}
+
+func UpdateUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	var u models.User
+
+	if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+		helpers.JSONResponse(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	nu, err := u.Update(ps.ByName("id"), u)
 	if err != nil {
 		helpers.JSONResponse(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -49,9 +66,8 @@ func NewUser(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 }
 
 func DeleteUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Fprintf(w, "Delete User Endpoint Hit")
-}
-
-func UpdateUser(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	fmt.Fprintf(w, "Update User Endpoint Hit")
+	var u models.User
+	u.Find(ps.ByName("id"))
+	u.Delete()
+	helpers.JSONResponse(w, u, http.StatusOK)
 }
